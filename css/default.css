@@ -1,0 +1,23 @@
+#projectList a,
+#projectList span {
+  margin-right: 5px;
+  margin-left: 5px;
+}
+
+#projectList a {
+  border-right: 1px solid black;
+  padding-right: 5px;
+  margin-right: 0px;
+}
+
+#projectList a.selected {
+  /*border-radius: 10px;*/
+  color: green;
+  text-shadow: 1px 1px 0 gray;
+  /*color: white;*/
+}
+
+#projectList a.last {
+  border-right: none;
+}
+
