@@ -1,27 +1,17 @@
 define([], function() {
 	return Backbone.View.extend({
-		tagName: "div",
-		className: "project panel panel-default",
+		tagName: "li",
+		className: "list-group-item project",
 		template: _.template(
-			'<div class="panel-heading">\
-				<a class="accordion-toggle" data-toggle="collapse" data-parent="#sidebar" href="#p<%- id %>">\
-					<span class="badge pull-right" data-color="<%- color %>">&nbsp;</span><%- name %>\
-				</a>\
-			</div>\
-			<div id="p<%- id %>" class="panel-collapse collapse">\
-				<div class="panel-body">\
-					<form class="form-horizontal">\
-					  <div class="form-group">\
-					    <label for="width<%- id %>" class="col-lg-3 control-label">Width</label>\
-					    <div class="col-lg-9">\
-					      <input type="text" class="my-slider" value="" data-slider-min="1"">\
-					    </div>\
-					  </div>\
-					</form>\
-				</div>\
-			</div>'),
+			'<span class="badge pull-left color-indicator" data-color="<%- color %>"></span>&nbsp;<span class="title"><%- name %></span>\
+			<button class="close" type="button">x</button>'
+		),
+		// closedTemplate: _.template(
+		// 	'<span class="badge pull-left color-indicator" data-toggle="tooltip"></span>\&nbsp;'
+		// ),
 		events: {
 			"show.bs.collapse": "onShow",
+			"click .close": "close",
 			"slideStop": function() {
 				this.$el.find(".my-slider").trigger("change");
 			},
@@ -43,7 +33,7 @@ define([], function() {
 			".my-slider": "width"
 		},
 		initialize: function() {
-			this.listenTo(this.model, "change:selected", this.render);
+			// this.listenTo(this.model, "change:selected", this.toggleVisibility);
 		},
 		render: function() {
 			this.$el.html(this.template(this.model.toJSON()));
@@ -52,20 +42,25 @@ define([], function() {
 				this.$el.show();
 			else
 				this.$el.hide();
-
-			this.$el.find(".badge").colorpicker();
+			
+			this.$el.find(".color-indicator")
+				.colorpicker()
+				.tooltip({
+					placement: "left",
+					title: this.model.get("name")
+				});
+			
 			this.stickit();
 
 			return this;
 		},
-		onShow: function() {
-			var that = this;
-			setTimeout(function() {
-				that.$el.find(".my-slider").slider({
-					value: that.model.get("width")
-				});
 
-			}, 10);
+		close: function() {
+			this.model.set("selected", false);
+		},
+		toggleVisibility: function(model, selected) {
+			if(selected) this.$el.show();
+			else this.$el.hide();
 		}
 	});
 });

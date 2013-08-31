@@ -20,6 +20,9 @@
     "jquery": "~2.0.3",
     "requirejs": "~2.1.8",
     "highstock": "~3.0.1",
-    "backbone.stickit": "~0.6.3"
+    "backbone.stickit": "~0.6.3",
+    "typeahead.js": "~0.9.3",
+    "momentjs": "~2.1.0",
+    "bootstrap-colorpicker": "https://github.com/xaguilars/bootstrap-colorpicker.git"
   }
 }
