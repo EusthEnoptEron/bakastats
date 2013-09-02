@@ -39,9 +39,13 @@ define(["moment"], function(moment) {
 			} else if(project.loaded && selected && !this.chart.get(project.id)) {
 				this.onLoaded(project, project.get("data"));
 			} else if(project.loaded && !selected) {
-				var series = this.chart.get(project.id);
-				if(series) series.remove();
+				this.removeSeries(project.id);
+				this.removeSeries(project.id + "_flags");
 			}
+		},
+		removeSeries: function(id) {
+			var series = this.chart.get(id);
+			if(series) series.remove();
 		},
 		onLoaded: function(project, data) {
 			if(project.get("selected")) {
@@ -74,6 +78,7 @@ define(["moment"], function(moment) {
 				var labels = project.get("labels");
 				if(labels && labels.length) {
 					this.chart.addSeries({
+						id: project.id + "_flags",
 						type: "flags",
 						onSeries: project.id,
 						data: labels
