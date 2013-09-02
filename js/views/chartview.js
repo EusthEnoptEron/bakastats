@@ -45,7 +45,27 @@ define(["moment"], function(moment) {
 		},
 		removeSeries: function(id) {
 			var series = this.chart.get(id);
-			if(series) series.remove();
+			if(series) {
+				series.remove();
+
+				if(this.baseSeries == id) {
+					var topCandidate = null;
+					// We gotta update the base series...
+					_.forEach(this.collection.where({selected: true}), function(project) {
+						if(project.get("data") && (
+							!topCandidate
+							|| project.get("data")[0][0] < topCandidate.get("data")[0][0]
+						))
+							topCandidate = project;
+					});
+					if(topCandidate) {
+						this.updateBaseSeries({
+							id: topCandidate.id,
+							data: topCandidate.get("data")
+						});
+					}
+				}
+			}
 		},
 		onLoaded: function(project, data) {
 			if(project.get("selected")) {
@@ -64,16 +84,9 @@ define(["moment"], function(moment) {
 					this.initChart(options);
 				} else {
 					this.chart.addSeries(options);
-
-					if(!this.baseSeries.length ||
-						(data.length && data[0][0] < this.baseSeries[0][0])) {
-	
-						this.chart.series[1].setData(data);
-						this.baseSeries = data;
-					}
-					// if(data.length && data[0][0] <) 
-
 				}
+
+				this.updateBaseSeries(options);
 
 				var labels = project.get("labels");
 				if(labels && labels.length) {
@@ -99,7 +112,7 @@ define(["moment"], function(moment) {
 			} else {
 				from = moment().subtract("month", 3).startOf("month");
 			}
-			console.log(to);
+
 			if(to) {
 				to = moment(to);
 			} else {
@@ -116,7 +129,6 @@ define(["moment"], function(moment) {
 			    title: {
 			        text: 'Baka-Tsuki Total Views'
 			    },
-
 			    navigator: {
 			    	baseSeries: 0
 			    },
@@ -140,7 +152,6 @@ define(["moment"], function(moment) {
 			    },
 			    series: [series]
 			});
-			this.baseSeries = series.data;
 		},
 		onChange: function(project) {
 			var series;
@@ -167,6 +178,18 @@ define(["moment"], function(moment) {
 		},
 		resize: function() {
 			this.$el.css("height", $(window).height() + "px");
+		},
+		updateBaseSeries: function(series) {
+			if(this.baseSeries) {
+				var rival = this.chart.get(this.baseSeries);
+				if(!rival ||
+					(series.data.length && series.data[0][0] < rival.xData[0])) {
+					this.chart.series[1].setData(series.data);
+					this.baseSeries = series.id;
+				}
+			} else {
+				this.baseSeries = series.id;
+			}
 		}
 	});
 });
